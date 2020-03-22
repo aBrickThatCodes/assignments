@@ -22,9 +22,9 @@ dfR = pd.read_csv(url, error_bad_lines=False)
 # Helper function (strftime not cross platform) ???
 def format_date(date: datetime.date):
     if os.name == "nt":
-        return date.strftime('%#m/%#d/%y')
+        return date.strftime('%#m/%#d/%y').lstrip("0").replace(" 0","").replace("/0", "/")
     else:
-        return date.strftime('%-m/%-d/%y')
+        return date.strftime('%-m/%-d/%y').lstrip("0").replace(" 0","").replace("/0", "/")
 
 
 def countries_with_no_deaths_count(date: datetime.date) -> int:
@@ -41,7 +41,11 @@ def countries_with_no_deaths_count(date: datetime.date) -> int:
     """
     
     # Your code goes here
-    pass
+    dateStr=format_date(date)
+    prevDayStr=format_date(date-datetime.timedelta(days=1))
+    count=0
+    placesToCheck=dfC.loc[dfC[dateStr]-dfC[prevDayStr]]
+    return len(dfD.loc[dfD["Country/Region"] in placesToCheck['Country/Region'].values.tolist(),dfD[dateStr]-dfD[prevDayStr]])
 
 
 def more_cured_than_deaths_indices(date: datetime.date) -> List[int]:
